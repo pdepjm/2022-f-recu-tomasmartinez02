@@ -12,6 +12,9 @@ data Persona = UnaPersona {
 }deriving(Show,Eq)
 
 sofia = UnaPersona 0 []
+claudio = UnaPersona 6000 ["Vitamina A", "Zinc"]
+marta = UnaPersona 800 ["Vitamina A", "Vitamina C"] 
+santi = UnaPersona 1000 ["Fibras"]
 
 incorporaNutriente :: String -> Persona -> Persona
 incorporaNutriente nutriente persona | elem nutriente (nutrientes persona) = persona
@@ -65,31 +68,56 @@ come persona comida = comida persona
 menu1 :: Menu
 menu1 = [pan integral, zanahoria, hamburguesaCheta]
 
+menu2 :: Menu
+menu2 = [carne 10, pan integral]
+
 -- PUNTO 4
 
 data Evento = UnEvento {
     nombre :: String,
     menu :: Menu,
     invitados :: Invitados
-}
+}deriving(Show,Eq)
 
 type Invitados = [Persona]
 
 satisfecho :: Persona -> Bool
---satisfecho persona = estaPipona persona || length(nutrientes persona) > 5
 satisfecho persona = estaPipona persona || ((>5).length.nutrientes) persona
 
 altaFiesta :: Evento -> Bool
-altaFiesta evento = all satisfecho (map (comeMenu (menu evento)) (invitados evento))
+altaFiesta evento = all satisfecho (invitadosComen evento)
 
+invitadosComen :: Evento -> Invitados
+invitadosComen evento = map (comeMenu (menu evento)) (invitados evento)
 
 -- PUNTO 5
 
 type Eventos = [Evento]
 
+evento1 = UnEvento {
+    nombre = "Casamiento de Mirta y José",
+    menu = menu1,
+    invitados = [sofia,claudio,marta]
+}
+
+evento2 = UnEvento {
+    nombre = "Cumpleanios de Juan",
+    menu = menu2,
+    invitados = [sofia,claudio,marta]
+}
+
+evento3 = UnEvento {
+    nombre = "Cumpleanios de Carlos",
+    menu = menu2,
+    invitados = [claudio,marta]
+}
+
+eventos1 :: Eventos
+eventos1 = [evento1,evento2,evento3]
+
 valeLaPena :: Persona -> Evento -> Evento
 valeLaPena persona evento | altaFiesta evento = evento {invitados = (persona:invitados evento)}
-                        | otherwise = evento
+                          | otherwise = evento
 
 seInvita :: Persona -> Eventos -> Eventos
 seInvita persona eventos = map (valeLaPena persona) eventos  
@@ -98,52 +126,4 @@ seInvita persona eventos = map (valeLaPena persona) eventos
 -- No se podria determinar si un evento infinito es alta fiesta ya que utilizamos la funcion all, que busca analizar si todos los 
 -- invitados estan satisfechos. Es por esto que infinitamente se quedara analizando si todos los invitados estan satisfechos y 
 -- nunca podra determinar si es alta fiesta o no.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
